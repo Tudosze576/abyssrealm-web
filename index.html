@@ -2294,68 +2294,9 @@ function closeRegModal(e){
     document.body.style.overflow='';
   }
 }
-function handleRegister(){
-  // Get form values
-  const inputs = document.querySelectorAll('.reg-input');
-  const name  = inputs[0].value.trim();
-  const email = inputs[1].value.trim();
-  const pass  = inputs[2].value.trim();
-  const pass2 = inputs[3].value.trim();
 
-  // Validation
-  if(!name || !email || !pass || !pass2){
-    inputs.forEach(i=>{
-      if(!i.value.trim()) i.style.borderColor='rgba(192,57,43,0.8)';
-    });
-    setTimeout(()=>inputs.forEach(i=>i.style.borderColor=''),2000);
-    return;
-  }
-  if(pass !== pass2){
-    inputs[2].style.borderColor='rgba(192,57,43,0.8)';
-    inputs[3].style.borderColor='rgba(192,57,43,0.8)';
-    inputs[3].placeholder='Passwords do not match!';
-    setTimeout(()=>{
-      inputs[2].style.borderColor='';
-      inputs[3].style.borderColor='';
-      inputs[3].placeholder='••••••••';
-    },2000);
-    return;
-  }
 
-  // Success animation
-  const btn=document.querySelector('.reg-btn');
-  const orig=btn.innerHTML;
-  btn.innerHTML='<span>✓ Welcome to the Realm</span>';
-  btn.style.background='linear-gradient(135deg,#1a5c1a,#2d8f2d)';
 
-  setTimeout(()=>{
-    btn.innerHTML=orig;
-    btn.style.background='';
-    closeRegModal();
-
-    // Save user data
-    const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    localStorage.setItem('arc-user', JSON.stringify({name, email, initials}));
-
-    // Update nav & profile panel with user info
-    loginUser({name, email, initials});
-  }, 1800);
-}
-
-function loginUser(user){
-  // Update nav avatar
-  document.querySelector('.nav-avatar').textContent = user.initials;
-  document.querySelector('.nav-uname').textContent  = user.name.split(' ')[0];
-  document.getElementById('nav-join').style.display = 'none';
-  document.getElementById('nav-user').style.display = 'flex';
-
-  // Update profile panel
-  document.querySelector('.pp-avatar').textContent    = user.initials;
-  document.querySelector('.pp-avatar-lg').textContent = user.initials;
-  document.querySelector('.pp-name').textContent      = user.name;
-  document.querySelector('.pp-email').textContent     = user.email;
-  document.querySelector('.pp-avatar-edit + .pp-form .pp-input').value = user.name;
-}
 
 function updateLangBtns(l){
   document.querySelectorAll('.pp-lang-btn').forEach(b=>{
