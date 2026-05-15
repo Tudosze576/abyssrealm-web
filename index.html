@@ -1383,6 +1383,33 @@ function updateLangBtns(l){
     b.classList.toggle('active', b.textContent.trim().startsWith(l.toUpperCase()));
   });
 }
+
+// ── PROFILE PANEL FUNCTIONS ──
+function openProfilePanel(){
+  document.getElementById('profile-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeProfilePanel(e){
+  if(!e || e.target===document.getElementById('profile-overlay')){
+    document.getElementById('profile-overlay').classList.remove('open');
+    document.body.style.overflow='';
+  }
+}
+
+function switchTab(name, btn){
+  document.querySelectorAll('.pp-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.pp-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  const pane = document.getElementById('tab-'+name);
+  if(pane) pane.classList.add('active');
+}
+
+function updateLangBtns(l){
+  document.querySelectorAll('.pp-lang-btn').forEach(b=>{
+    b.classList.toggle('active', b.textContent.trim().toUpperCase().startsWith(l.toUpperCase()));
+  });
+}
 function handleLogout(){
   localStorage.removeItem('arc-user');
   document.getElementById('nav-user').style.display='none';
@@ -1396,7 +1423,7 @@ function handleLogout(){
   if(saved){ try{ loginUser(JSON.parse(saved)); }catch(e){} }
 })();
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){ closeRegModal(); closeProfilePanel(); }});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){ closeRegModal(); if(typeof closeProfilePanel==='function') closeProfilePanel(); }});
 
 applyLang(curLang);
 document.querySelectorAll('.lbtn').forEach(b=>b.classList.toggle('on',b.textContent.trim().toLowerCase()===curLang));
