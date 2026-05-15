@@ -432,6 +432,9 @@ Studio</div>
         <span class="nav-uname">Realm</span>
         <span>▾</span>
       </div>
+      <button class="nav-cart-btn" onclick="toggleCart()" id="nav-cart-btn" title="Cart">
+        🛒<span class="nav-cart-count" id="cart-count" style="display:none">0</span>
+      </button>
       <button class="nav-cta" data-i18n="nav_cta">Shop Now</button>
     </div>
   </nav>
@@ -933,6 +936,566 @@ function showToast(msg){
 }
 
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeRegModal(); });
+</script>
+
+<!-- CART DRAWER -->
+<div id="cart-overlay" class="cart-overlay" onclick="if(event.target===this)toggleCart()">
+  <div class="cart-drawer">
+    <div class="cart-header">
+      <h3 class="cart-title">🛒 Cart <span id="cart-item-count">(0 items)</span></h3>
+      <button class="cart-close" onclick="toggleCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cart-items">
+      <div class="cart-empty" id="cart-empty">
+        <div style="font-size:3rem;opacity:0.3">🌑</div>
+        <div style="font-family:Playfair Display,serif;color:var(--text-mid);margin-top:8px">Your cart is empty</div>
+        <div style="font-size:0.8rem;color:var(--text-dim);margin-top:4px;font-style:italic">Enter the Abyss and find your treasures</div>
+      </div>
+    </div>
+    <div class="cart-footer" id="cart-footer" style="display:none">
+      <div class="cart-summary">
+        <div class="cart-sum-row"><span>Subtotal</span><span id="cart-subtotal">€0.00</span></div>
+        <div class="cart-sum-row"><span>Shipping</span><span id="cart-shipping">—</span></div>
+        <div class="cart-sum-row cart-total-row"><span>Total</span><span id="cart-total">€0.00</span></div>
+      </div>
+      <button class="cart-checkout-btn" onclick="showToast('💳 Stripe checkout coming soon!')">Proceed to Checkout →</button>
+      <button class="cart-continue-btn" onclick="toggleCart()">Continue Shopping</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE PANEL -->
+<div id="profile-overlay" class="profile-overlay" onclick="if(event.target===this)closeProfilePanel()">
+  <div class="profile-panel">
+    <!-- Cover -->
+    <div class="pp-cover">
+      <div class="pp-cover-img"></div>
+      <button class="pp-close" onclick="closeProfilePanel()">✕</button>
+      <div class="pp-cover-bottom">
+        <div style="position:relative;flex-shrink:0">
+          <div class="pp-avatar">S</div>
+          <div style="position:absolute;bottom:3px;right:3px;width:12px;height:12px;border-radius:50%;background:#2ecc71;border:2px solid #0a0810"></div>
+        </div>
+        <div style="flex:1;min-width:0;padding-bottom:4px">
+          <div class="pp-name">Shadow Walker</div>
+          <div class="pp-email">shadow@abyssrealm.com</div>
+          <div class="pp-rank-badge">⚔ Realm Member</div>
+        </div>
+        <button class="pp-edit-profile-btn" onclick="switchPPTab('profile',document.querySelectorAll('.pp-tab')[4])">Edit Profile</button>
+      </div>
+    </div>
+    <!-- Membership -->
+    <div class="pp-membership">
+      <div class="pp-mem-info">
+        <span class="pp-mem-label">⚔ REALM MEMBER</span>
+        <span class="pp-mem-next">→ DARK KNIGHT at €150</span>
+      </div>
+      <div class="pp-mem-bar-wrap"><div class="pp-mem-bar" style="width:0%"></div></div>
+      <div class="pp-mem-spent">€0 / €150 spent</div>
+    </div>
+    <!-- Stats -->
+    <div class="pp-stats">
+      <div class="pp-stat"><div style="font-size:1rem">📦</div><div class="pp-stat-n" id="stat-orders">0</div><div class="pp-stat-l">Orders</div></div>
+      <div class="pp-stat-div"></div>
+      <div class="pp-stat"><div style="font-size:1rem">🛒</div><div class="pp-stat-n" id="stat-cart">0</div><div class="pp-stat-l">In Cart</div></div>
+      <div class="pp-stat-div"></div>
+      <div class="pp-stat"><div style="font-size:1rem">♥</div><div class="pp-stat-n" id="stat-wish">0</div><div class="pp-stat-l">Wishlist</div></div>
+      <div class="pp-stat-div"></div>
+      <div class="pp-stat"><div style="font-size:1rem">💰</div><div class="pp-stat-n" id="stat-spent">€0</div><div class="pp-stat-l">Spent</div></div>
+    </div>
+    <!-- Tabs -->
+    <div class="pp-tabs">
+      <button class="pp-tab active" onclick="switchPPTab('overview',this)">🏠 Overview</button>
+      <button class="pp-tab" onclick="switchPPTab('orders',this)">📦 Orders</button>
+      <button class="pp-tab" onclick="switchPPTab('library',this)">📁 Library</button>
+      <button class="pp-tab" onclick="switchPPTab('wishlist',this)">♥ Wishlist</button>
+      <button class="pp-tab" onclick="switchPPTab('profile',this)">👤 Profile</button>
+      <button class="pp-tab" onclick="switchPPTab('settings',this)">⚙ Settings</button>
+    </div>
+    <!-- Content -->
+    <div class="pp-content">
+
+      <!-- OVERVIEW -->
+      <div class="pp-pane active" id="pptab-overview">
+        <div class="pp-section-title">🏆 Achievements</div>
+        <div class="pp-badges">
+          <div class="pp-badge-item earned"><div class="pp-badge-icon">⚔</div><div class="pp-badge-name">Initiate</div></div>
+          <div class="pp-badge-item locked"><div class="pp-badge-icon">🔒</div><div class="pp-badge-name">First Blood</div></div>
+          <div class="pp-badge-item locked"><div class="pp-badge-icon">🔒</div><div class="pp-badge-name">Collector</div></div>
+          <div class="pp-badge-item locked"><div class="pp-badge-icon">🔒</div><div class="pp-badge-name">Patron</div></div>
+          <div class="pp-badge-item locked"><div class="pp-badge-icon">🔒</div><div class="pp-badge-name">Hoarder</div></div>
+          <div class="pp-badge-item locked"><div class="pp-badge-icon">🔒</div><div class="pp-badge-name">Dark Knight</div></div>
+        </div>
+        <div class="pp-section-title" style="margin-top:20px">🕐 Recent Activity</div>
+        <div id="pp-activity-feed">
+          <div style="text-align:center;color:var(--text-dim);padding:20px;font-size:0.82rem">No activity yet — start exploring the Realm!</div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div class="pp-pane" id="pptab-orders">
+        <div class="pp-section-title">📦 Order History</div>
+        <div class="pp-order-list" id="pp-order-list">
+          <div style="text-align:center;color:var(--text-dim);padding:20px;font-size:0.82rem">No orders yet — <a href="#" class="pp-link" onclick="closeProfilePanel()">start shopping</a></div>
+        </div>
+      </div>
+
+      <!-- LIBRARY -->
+      <div class="pp-pane" id="pptab-library">
+        <div class="pp-section-title">📁 Digital Library</div>
+        <div class="pp-lib-grid" id="pp-library">
+          <div style="text-align:center;color:var(--text-dim);padding:20px;font-size:0.82rem;grid-column:1/-1">No downloads yet</div>
+        </div>
+      </div>
+
+      <!-- WISHLIST -->
+      <div class="pp-pane" id="pptab-wishlist">
+        <div class="pp-section-title">♥ Saved Items</div>
+        <div class="pp-wish-list" id="pp-wishlist">
+          <div style="text-align:center;color:var(--text-dim);padding:20px;font-size:0.82rem">No saved items yet</div>
+        </div>
+      </div>
+
+      <!-- PROFILE EDIT -->
+      <div class="pp-pane" id="pptab-profile">
+        <div class="pp-section-title">👤 Public Profile</div>
+        <div class="pp-avatar-edit">
+          <div class="pp-avatar-lg">S</div>
+          <button class="pp-edit-av">Change Avatar</button>
+        </div>
+        <div class="pp-form">
+          <div class="pp-field"><label class="pp-label">Display Name</label><input class="pp-input" id="pp-displayname" placeholder="Shadow Walker"></div>
+          <div class="pp-field"><label class="pp-label">Bio</label><textarea class="pp-input pp-textarea" id="pp-bio" placeholder="Tell the Realm about yourself..."></textarea></div>
+          <div class="pp-field"><label class="pp-label">Location</label><input class="pp-input" id="pp-location" placeholder="e.g. Budapest, Hungary"></div>
+          <div class="pp-section-title" style="margin-top:4px">Social Links</div>
+          <div class="pp-field"><label class="pp-label">TikTok</label><input class="pp-input" id="pp-tiktok" placeholder="@username"></div>
+          <div class="pp-field"><label class="pp-label">Instagram</label><input class="pp-input" id="pp-instagram" placeholder="@username"></div>
+          <div class="pp-field"><label class="pp-label">Discord</label><input class="pp-input" id="pp-discord" placeholder="username#0000"></div>
+          <button class="pp-save-btn" onclick="saveProfile()">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="pp-pane" id="pptab-settings">
+        <div class="pp-section-title">🔐 Account</div>
+        <div class="pp-form">
+          <div class="pp-field"><label class="pp-label">Email</label><input class="pp-input" id="pp-email-field" readonly></div>
+          <div class="pp-field"><label class="pp-label">New Password</label><input class="pp-input" type="password" placeholder="Leave blank to keep current"></div>
+          <button class="pp-save-btn">Update Account</button>
+        </div>
+        <div class="pp-section-title" style="margin-top:20px">🔔 Notifications</div>
+        <div class="pp-toggles">
+          <div class="pp-toggle-row"><span>New product alerts</span><label class="pp-toggle"><input type="checkbox" checked><span class="pp-slider"></span></label></div>
+          <div class="pp-toggle-row"><span>Order updates</span><label class="pp-toggle"><input type="checkbox" checked><span class="pp-slider"></span></label></div>
+          <div class="pp-toggle-row"><span>Promotions</span><label class="pp-toggle"><input type="checkbox"><span class="pp-slider"></span></label></div>
+        </div>
+        <div class="pp-section-title" style="margin-top:20px">⚠ Danger Zone</div>
+        <button class="pp-danger-btn">🗑 Delete Account</button>
+        <button class="pp-logout" onclick="handleLogout()">⬡ Sign Out</button>
+      </div>
+
+    </div><!-- end pp-content -->
+  </div>
+</div>
+
+<style>
+/* ═══ NAV CART ═══ */
+.nav-cart-btn{position:relative;background:transparent;border:1px solid var(--border);border-radius:6px;padding:8px 12px;cursor:pointer;color:var(--text-mid);font-size:1rem;transition:all 0.25s}
+.nav-cart-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+.nav-cart-count{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:var(--red-mid);color:#fff;font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+/* ═══ CART DRAWER ═══ */
+.cart-overlay{position:fixed;inset:0;z-index:2500;background:rgba(4,4,10,0.7);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.35s}
+.cart-overlay.open{opacity:1;pointer-events:all}
+.cart-drawer{position:absolute;right:0;top:0;bottom:0;width:380px;background:linear-gradient(160deg,#0e0b18,#0a0810);border-left:1px solid var(--border-mid);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);box-shadow:-20px 0 60px rgba(0,0,0,0.6)}
+.cart-overlay.open .cart-drawer{transform:translateX(0)}
+.cart-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);flex-shrink:0}
+.cart-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--gold-bright)}
+.cart-title span{font-size:0.75rem;color:var(--text-dim);font-family:'Raleway',sans-serif;font-weight:400}
+.cart-close{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:1rem;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.cart-close:hover{background:rgba(201,168,76,0.1);color:var(--gold)}
+.cart-items{flex:1;overflow-y:auto;padding:16px;scrollbar-width:thin;scrollbar-color:var(--gold-dim) transparent}
+.cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;text-align:center}
+.cart-item{display:flex;gap:12px;padding:12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,0.02);margin-bottom:10px}
+.cart-item-icon{font-size:2rem;flex-shrink:0}
+.cart-item-info{flex:1;min-width:0}
+.cart-item-name{font-size:0.85rem;color:var(--text);margin-bottom:3px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cart-item-type{font-family:'Cinzel',serif;font-size:0.48rem;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:6px}
+.cart-item-qty{display:flex;align-items:center;gap:8px}
+.cart-qty-btn{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text-mid);cursor:pointer;font-size:0.8rem;transition:all 0.2s;display:flex;align-items:center;justify-content:center}
+.cart-qty-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+.cart-qty-num{font-family:'Cinzel',serif;font-size:0.7rem;color:var(--text);min-width:20px;text-align:center}
+.cart-item-price{font-family:'Playfair Display',serif;font-size:0.95rem;color:var(--gold-bright);font-weight:700;flex-shrink:0;align-self:center}
+.cart-item-remove{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:0.75rem;padding:4px;flex-shrink:0;align-self:flex-start;transition:color 0.2s}
+.cart-item-remove:hover{color:#ff6666}
+.cart-footer{padding:16px 24px 24px;border-top:1px solid var(--border);flex-shrink:0}
+.cart-summary{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.cart-sum-row{display:flex;justify-content:space-between;font-size:0.82rem;color:var(--text-dim)}
+.cart-total-row{padding-top:10px;border-top:1px solid var(--border);font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold-bright);font-weight:700}
+.cart-checkout-btn{width:100%;padding:14px;border-radius:4px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--red),var(--red-mid));font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.18em;color:#fff;transition:all 0.3s;margin-bottom:8px;box-shadow:0 4px 24px rgba(139,26,26,0.4)}
+.cart-checkout-btn:hover{transform:translateY(-2px)}
+.cart-continue-btn{width:100%;padding:10px;border-radius:4px;background:transparent;border:1px solid var(--border);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.12em;color:var(--text-dim);cursor:pointer;transition:all 0.2s}
+.cart-continue-btn:hover{border-color:var(--border-mid);color:var(--text)}
+
+/* ═══ PROFILE PANEL ═══ */
+.profile-overlay{position:fixed;inset:0;z-index:3000;background:rgba(4,4,10,0.75);backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity 0.35s}
+.profile-overlay.open{opacity:1;pointer-events:all}
+.profile-panel{position:absolute;right:0;top:0;bottom:0;width:440px;background:linear-gradient(160deg,#0e0b18,#0a0810 50%,#10080c);border-left:1px solid var(--border-mid);display:flex;flex-direction:column;overflow:hidden;transform:translateX(100%);transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);box-shadow:-24px 0 80px rgba(0,0,0,0.7)}
+.profile-overlay.open .profile-panel{transform:translateX(0)}
+
+.pp-cover{position:relative;flex-shrink:0}
+.pp-cover-img{height:90px;background:linear-gradient(135deg,#1a0808,#200a20 40%,#080514 70%,#1a0a08)}
+.pp-close{position:absolute;top:12px;right:12px;z-index:10;background:rgba(4,4,10,0.6);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-size:0.9rem}
+.pp-close:hover{background:rgba(201,168,76,0.15);color:var(--gold)}
+.pp-cover-bottom{display:flex;align-items:flex-end;gap:14px;padding:0 20px 16px;margin-top:-30px;position:relative;z-index:5}
+.pp-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:1.3rem;color:var(--gold-bright);font-weight:700;border:3px solid #0a0810;flex-shrink:0}
+.pp-name{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--gold-bright)}
+.pp-email{font-size:0.72rem;color:var(--text-dim);margin-bottom:4px}
+.pp-rank-badge{font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.18em;padding:2px 8px;border-radius:10px;border:1px solid rgba(192,57,43,0.4);background:rgba(139,26,26,0.18);color:#ff9999;display:inline-block}
+.pp-edit-profile-btn{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.1em;padding:6px 12px;border-radius:3px;border:1px solid var(--border-mid);background:transparent;color:var(--text-mid);cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0;align-self:flex-end;margin-bottom:4px}
+.pp-edit-profile-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+
+.pp-membership{padding:10px 20px;background:rgba(201,168,76,0.04);border-bottom:1px solid var(--border);border-top:1px solid var(--border)}
+.pp-mem-info{display:flex;justify-content:space-between;margin-bottom:5px}
+.pp-mem-label{font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.2em;color:var(--gold)}
+.pp-mem-next{font-family:'Cinzel',serif;font-size:0.52rem;color:var(--text-dim)}
+.pp-mem-bar-wrap{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.pp-mem-bar{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));border-radius:2px;transition:width 1s ease}
+.pp-mem-spent{font-size:0.72rem;color:var(--text-dim);text-align:right}
+
+.pp-stats{display:flex;align-items:center;justify-content:space-around;padding:14px 20px;border-bottom:1px solid var(--border)}
+.pp-stat{text-align:center}
+.pp-stat-n{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold-bright);line-height:1}
+.pp-stat-l{font-family:'Cinzel',serif;font-size:0.48rem;letter-spacing:0.12em;color:var(--text-dim);text-transform:uppercase;margin-top:2px}
+.pp-stat-div{width:1px;height:36px;background:var(--border)}
+
+.pp-tabs{display:flex;gap:2px;padding:10px 14px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.pp-tabs::-webkit-scrollbar{display:none}
+.pp-tab{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.08em;text-transform:uppercase;padding:6px 10px;border-radius:4px;border:1px solid transparent;background:transparent;color:var(--text-dim);cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.pp-tab:hover{color:var(--gold)}
+.pp-tab.active{color:var(--gold-bright);border-color:var(--gold-dim);background:rgba(201,168,76,0.08)}
+
+.pp-content{flex:1;overflow-y:auto;padding:18px 20px 24px;scrollbar-width:thin;scrollbar-color:var(--gold-dim) transparent}
+.pp-pane{display:none;flex-direction:column;gap:12px}
+.pp-pane.active{display:flex}
+.pp-section-title{font-family:'Cinzel',serif;font-size:0.56rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);padding-bottom:8px;border-bottom:1px solid var(--border)}
+.pp-link{color:var(--gold)}
+
+.pp-badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pp-badge-item{border:1px solid var(--border);border-radius:8px;padding:12px 8px;text-align:center;transition:all 0.2s}
+.pp-badge-item.earned{border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.06)}
+.pp-badge-item.locked{opacity:0.35}
+.pp-badge-icon{font-size:1.6rem;margin-bottom:5px}
+.pp-badge-name{font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.1em;color:var(--text-mid)}
+
+.pp-order-list{display:flex;flex-direction:column;gap:10px}
+.pp-order{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,0.02)}
+.pp-order-icon{font-size:1.6rem;flex-shrink:0}
+.pp-order-info{flex:1;min-width:0}
+.pp-order-name{font-size:0.85rem;color:var(--text);margin-bottom:2px;font-weight:500}
+.pp-order-meta{font-size:0.72rem;color:var(--text-dim);margin-bottom:8px}
+.pp-order-btn{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.1em;padding:6px 12px;border-radius:3px;border:1px solid var(--border-mid);background:transparent;color:var(--text-mid);cursor:pointer;transition:all 0.2s;flex-shrink:0}
+.pp-order-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+
+.pp-lib-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pp-lib-item{border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;background:rgba(255,255,255,0.02);display:flex;flex-direction:column;gap:6px;transition:all 0.2s}
+.pp-lib-item:hover{border-color:var(--border-mid);transform:translateY(-2px)}
+.pp-lib-thumb{font-size:2rem}
+.pp-lib-name{font-size:0.8rem;color:var(--text);font-weight:500}
+.pp-lib-type{font-size:0.68rem;color:var(--text-dim)}
+.pp-lib-dl{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.1em;padding:7px;border-radius:3px;border:1px solid var(--gold-dim);background:rgba(201,168,76,0.06);color:var(--gold);cursor:pointer;transition:all 0.2s}
+.pp-lib-dl:hover{background:rgba(201,168,76,0.14)}
+
+.pp-wish-list{display:flex;flex-direction:column;gap:8px}
+.pp-wish-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.02)}
+.pp-wish-thumb{font-size:1.6rem;flex-shrink:0}
+.pp-wish-info{flex:1;min-width:0}
+.pp-wish-name{font-size:0.82rem;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pp-wish-price{font-family:'Cinzel',serif;font-size:0.7rem;color:var(--gold)}
+.pp-wish-cart{font-family:'Cinzel',serif;font-size:0.5rem;padding:6px 10px;border-radius:3px;border:1px solid rgba(192,57,43,0.4);background:rgba(139,26,26,0.15);color:#ff9999;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0}
+.pp-wish-cart:hover{background:rgba(139,26,26,0.3)}
+.pp-wish-rm{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:0.8rem;padding:4px 6px;flex-shrink:0}
+.pp-wish-rm:hover{color:#ff6666}
+
+.pp-avatar-edit{display:flex;align-items:center;gap:14px;margin-bottom:4px}
+.pp-avatar-lg{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:1.5rem;color:var(--gold-bright);font-weight:700;border:2px solid var(--gold-dim);flex-shrink:0}
+.pp-edit-av{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.12em;padding:7px 14px;border-radius:3px;border:1px solid var(--border-mid);background:transparent;color:var(--text-mid);cursor:pointer;transition:all 0.2s}
+.pp-edit-av:hover{border-color:var(--gold-dim);color:var(--gold)}
+.pp-form{display:flex;flex-direction:column;gap:11px}
+.pp-field{display:flex;flex-direction:column;gap:5px}
+.pp-label{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim)}
+.pp-input{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:4px;padding:10px 13px;color:var(--text);font-family:'Raleway',sans-serif;font-size:0.85rem;outline:none;transition:all 0.25s}
+.pp-input::placeholder{color:var(--text-dim)}
+.pp-input:focus{border-color:var(--gold-dim);background:rgba(201,168,76,0.04)}
+.pp-textarea{min-height:75px;resize:vertical}
+.pp-save-btn{padding:11px;border-radius:4px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--gold-dim),var(--gold));font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.15em;color:var(--bg);transition:all 0.3s}
+.pp-save-btn:hover{opacity:0.85;transform:translateY(-1px)}
+
+.pp-toggles{display:flex;flex-direction:column;gap:11px}
+.pp-toggle-row{display:flex;align-items:center;justify-content:space-between;font-size:0.82rem;color:var(--text-mid)}
+.pp-toggle{position:relative;display:inline-block;width:42px;height:22px;flex-shrink:0}
+.pp-toggle input{opacity:0;width:0;height:0}
+.pp-slider{position:absolute;inset:0;background:rgba(255,255,255,0.08);border-radius:22px;cursor:pointer;transition:0.3s;border:1px solid var(--border)}
+.pp-slider::before{content:'';position:absolute;width:16px;height:16px;left:2px;bottom:2px;background:var(--text-dim);border-radius:50%;transition:0.3s}
+.pp-toggle input:checked+.pp-slider{background:rgba(201,168,76,0.2);border-color:var(--gold-dim)}
+.pp-toggle input:checked+.pp-slider::before{transform:translateX(20px);background:var(--gold)}
+.pp-danger-btn{width:100%;padding:10px;border-radius:4px;border:1px solid rgba(192,57,43,0.4);background:transparent;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.12em;color:#ff9999;cursor:pointer;transition:all 0.2s}
+.pp-danger-btn:hover{background:rgba(139,26,26,0.2)}
+.pp-logout{width:100%;margin-top:8px;padding:11px;border-radius:4px;border:1px solid var(--border-mid);background:rgba(255,255,255,0.03);font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.15em;color:var(--text-mid);cursor:pointer;transition:all 0.2s}
+.pp-logout:hover{border-color:rgba(192,57,43,0.4);color:#ff9999;background:rgba(139,26,26,0.1)}
+
+/* ═══ MOBILE ═══ */
+@media(max-width:768px){
+  .cart-drawer,.profile-panel{width:100%!important}
+  .pp-badges{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+
+<script>
+// ═══ CART ═══
+let cart = JSON.parse(localStorage.getItem('arc-cart')||'[]');
+
+function saveCart(){ localStorage.setItem('arc-cart',JSON.stringify(cart)); }
+
+function updateCartUI(){
+  const count = cart.reduce((s,i)=>s+i.qty,0);
+  const el = document.getElementById('cart-count');
+  if(el){ el.textContent=count; el.style.display=count>0?'flex':'none'; }
+  document.getElementById('stat-cart').textContent = count;
+
+  const itemsEl  = document.getElementById('cart-items');
+  const emptyEl  = document.getElementById('cart-empty');
+  const footerEl = document.getElementById('cart-footer');
+  const countLbl = document.getElementById('cart-item-count');
+  if(!itemsEl) return;
+
+  if(cart.length===0){
+    emptyEl.style.display='flex'; footerEl.style.display='none';
+    if(countLbl) countLbl.textContent='(0 items)';
+    return;
+  }
+  emptyEl.style.display='none'; footerEl.style.display='block';
+  if(countLbl) countLbl.textContent=`(${count} item${count!==1?'s':''})`;
+
+  const existing = itemsEl.querySelectorAll('.cart-item');
+  existing.forEach(e=>e.remove());
+  cart.forEach((item,idx)=>{
+    const div=document.createElement('div');
+    div.className='cart-item';
+    div.innerHTML=`
+      <div class="cart-item-icon">${item.icon}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-type">${item.type}</div>
+        <div class="cart-item-qty">
+          <button class="cart-qty-btn" onclick="changeQty(${idx},-1)">−</button>
+          <span class="cart-qty-num">${item.qty}</span>
+          <button class="cart-qty-btn" onclick="changeQty(${idx},1)">+</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="cart-item-price">€${(item.price*item.qty).toFixed(2)}</div>
+        <button class="cart-item-remove" onclick="removeFromCart(${idx})">✕</button>
+      </div>`;
+    itemsEl.appendChild(div);
+  });
+  const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const hasPhys = cart.some(i=>i.type==='Physical');
+  document.getElementById('cart-subtotal').textContent='€'+sub.toFixed(2);
+  document.getElementById('cart-shipping').textContent=hasPhys?'€4.99':'Free';
+  document.getElementById('cart-total').textContent='€'+(sub+(hasPhys?4.99:0)).toFixed(2);
+}
+
+function toggleCart(){
+  const o=document.getElementById('cart-overlay');
+  const open=o.classList.contains('open');
+  if(open){ o.classList.remove('open'); document.body.style.overflow=''; }
+  else { o.classList.add('open'); document.body.style.overflow='hidden'; updateCartUI(); }
+}
+
+function addToCart(name,price,icon,type){
+  const ex=cart.find(i=>i.name===name);
+  if(ex) ex.qty++;
+  else cart.push({name,price:parseFloat(price),icon,type,qty:1});
+  saveCart(); updateCartUI();
+}
+
+function changeQty(idx,d){
+  cart[idx].qty+=d;
+  if(cart[idx].qty<=0) cart.splice(idx,1);
+  saveCart(); updateCartUI();
+}
+
+function removeFromCart(idx){ cart.splice(idx,1); saveCart(); updateCartUI(); }
+
+// ═══ PROFILE PANEL ═══
+function openProfilePanel(){
+  document.getElementById('profile-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeProfilePanel(){
+  document.getElementById('profile-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function switchPPTab(name,btn){
+  document.querySelectorAll('.pp-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.pp-pane').forEach(p=>p.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const pane=document.getElementById('pptab-'+name);
+  if(pane) pane.classList.add('active');
+}
+
+// ═══ FULL LOGIN UI UPDATE ═══
+function loginUser(profile){
+  const initials=(profile.display_name||profile.email||'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'R';
+  const name=(profile.display_name||profile.email||'Realm').split(' ')[0];
+  const email=profile.email||'';
+  const spent=parseFloat(profile.total_spent||0);
+  const rank=profile.rank||'Realm Member';
+
+  // Nav
+  document.querySelector('.nav-avatar').textContent=initials;
+  document.querySelector('.nav-uname').textContent=name;
+  document.getElementById('nav-join').style.display='none';
+  document.getElementById('nav-user').style.display='flex';
+
+  // Profile panel
+  document.querySelectorAll('.pp-avatar,.pp-avatar-lg').forEach(el=>el.textContent=initials);
+  document.querySelector('.pp-name').textContent=profile.display_name||name;
+  document.querySelector('.pp-email').textContent=email;
+  document.querySelector('.pp-rank-badge').textContent='⚔ '+rank;
+  document.querySelector('.pp-mem-label').textContent='⚔ '+rank.toUpperCase();
+  document.querySelector('.pp-mem-spent').textContent='€'+spent.toFixed(2)+' / €150 spent';
+  document.querySelector('.pp-mem-bar').style.width=Math.min((spent/150)*100,100)+'%';
+  document.getElementById('stat-spent').textContent='€'+spent.toFixed(2);
+
+  // Settings
+  const ef=document.getElementById('pp-email-field');
+  if(ef) ef.value=email;
+
+  // Load data
+  loadOrdersUI();
+  updateCartUI();
+}
+
+async function loadOrdersUI(){
+  const {data:{user}}=await sb.auth.getUser();
+  if(!user) return;
+  const {data:orders}=await sb.from('orders').select('*').eq('user_id',user.id).order('created_at',{ascending:false});
+  if(!orders) return;
+  document.getElementById('stat-orders').textContent=orders.length;
+  const list=document.getElementById('pp-order-list');
+  if(!list||orders.length===0) return;
+  list.innerHTML=orders.map(o=>`
+    <div class="pp-order">
+      <div class="pp-order-icon">${o.product_icon||'📦'}</div>
+      <div class="pp-order-info">
+        <div class="pp-order-name">${o.product_name}</div>
+        <div class="pp-order-meta">${o.product_type||'Digital'} · €${parseFloat(o.product_price).toFixed(2)} · <span style="color:${o.status==='delivered'?'#66bb6a':o.status==='shipped'?'#ffb74d':'#90caf9'}">${o.status}</span></div>
+      </div>
+      <button class="pp-order-btn">${o.product_type==='digital'?'Download':'Track'}</button>
+    </div>`).join('');
+
+  // Library (digital only)
+  const digital=orders.filter(o=>o.product_type==='digital');
+  const lib=document.getElementById('pp-library');
+  if(lib&&digital.length>0){
+    lib.innerHTML=digital.map(o=>`
+      <div class="pp-lib-item">
+        <div class="pp-lib-thumb">${o.product_icon||'📁'}</div>
+        <div class="pp-lib-name">${o.product_name}</div>
+        <div class="pp-lib-type">Digital file</div>
+        <button class="pp-lib-dl">↓ Download</button>
+      </div>`).join('');
+  }
+
+  // Activity feed
+  const feed=document.getElementById('pp-activity-feed');
+  if(feed&&orders.length>0){
+    feed.innerHTML=orders.slice(0,4).map(o=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:6px">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="font-size:0.82rem;color:var(--text-mid)">Purchased <strong style="color:var(--text)">${o.product_name}</strong></div>
+          <div style="font-size:0.7rem;color:var(--text-dim);margin-top:1px">${new Date(o.created_at).toLocaleDateString()}</div>
+        </div>
+        <div style="font-size:1.2rem">${o.product_icon||'📦'}</div>
+      </div>`).join('');
+  }
+}
+
+async function saveProfile(){
+  const {data:{user}}=await sb.auth.getUser();
+  if(!user){ showToast('Sign in first'); return; }
+  const updates={
+    display_name:document.getElementById('pp-displayname').value,
+    bio:document.getElementById('pp-bio').value,
+    location:document.getElementById('pp-location').value,
+    tiktok:document.getElementById('pp-tiktok').value,
+    instagram:document.getElementById('pp-instagram').value,
+    discord:document.getElementById('pp-discord').value,
+    updated_at:new Date().toISOString()
+  };
+  const {error}=await sb.from('profiles').update(updates).eq('id',user.id);
+  if(error) showToast('✗ Error: '+error.message);
+  else { showToast('✓ Profile saved!'); document.querySelector('.pp-name').textContent=updates.display_name||'Realm Member'; }
+}
+
+// ═══ BUY BUTTONS ═══
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.c3-qbuy').forEach(btn=>{
+    btn.addEventListener('click',async function(e){
+      e.stopPropagation();
+      const card=this.closest('.c3');
+      if(!card) return;
+      const name=card.dataset.name||card.querySelector('.c3-name')?.textContent.trim()||'Product';
+      const price=parseFloat(card.dataset.price||0);
+      const icon=card.dataset.icon||'📦';
+      const type=card.dataset.type==='physical'?'Physical':'Digital';
+
+      // Button animation
+      const orig=this.innerHTML;
+      this.textContent='✓ Added!';
+      this.style.background='linear-gradient(135deg,#1a5c1a,#2d8f2d)';
+      setTimeout(()=>{ this.innerHTML=orig; this.style.background=''; },1600);
+
+      // Add to cart
+      addToCart(name,price,icon,type);
+      showToast(`✓ ${name} added to cart!`);
+      setTimeout(()=>toggleCart(),400);
+
+      // Save order to Supabase if logged in
+      const {data:{user}}=await sb.auth.getUser();
+      if(user){
+        const orderNum='ARC-'+Date.now().toString().slice(-6);
+        await sb.from('orders').insert({
+          user_id:user.id,
+          product_name:name,
+          product_price:price,
+          product_icon:icon,
+          product_type:type.toLowerCase(),
+          order_number:orderNum,
+          status:'confirmed',
+          quantity:1
+        });
+        loadOrdersUI();
+      }
+    });
+  });
+
+  // Cart on page load
+  updateCartUI();
+});
+
+// ESC key
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeRegModal && closeRegModal();
+    closeProfilePanel();
+    const co=document.getElementById('cart-overlay');
+    if(co?.classList.contains('open')) toggleCart();
+  }
+});
 </script>
 </body>
 </html>
